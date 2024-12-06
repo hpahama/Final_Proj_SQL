@@ -1,0 +1,101 @@
+-- Countries table (country-specific info)
+CREATE TABLE countries (
+    country_id SERIAL PRIMARY KEY,
+    country_name TEXT UNIQUE
+);
+
+-- Economic stats table (financial, health, and tax-related)
+CREATE TABLE economic (
+    economic_id SERIAL PRIMARY KEY, --- 
+    country_id INT REFERENCES countries(country_id),
+    population_density INT,
+    agricultural_land FLOAT,
+    land_area INT,
+    armed_forces INT,
+    birth_rate FLOAT,
+    co2_emissions INT,
+    cpi FLOAT,
+    fertility_rate FLOAT,
+    forested_area FLOAT,
+    gasoline_price DECIMAL(5, 2),
+    gdp DECIMAL(16, 2),
+    infant_mortality FLOAT,
+    life_expectancy FLOAT,
+    minimum_wage DECIMAL(5, 2),
+    out_of_pocket_health_expenditure FLOAT,
+    population BIGINT,
+    population_labor_force FLOAT,
+    tax_revenue FLOAT,
+    total_tax_rate FLOAT,
+    unemployment_rate FLOAT,
+    urban_population BIGINT
+);
+
+-- Populate the economic_stats table
+INSERT INTO economic (country_id, population_density, agricultural_land, land_area, armed_forces, birth_rate, co2_emissions, cpi, fertility_rate, forested_area, gasoline_price, gdp, infant_mortality, life_expectancy, minimum_wage, out_of_pocket_health_expenditure, population, population_labor_force, tax_revenue, total_tax_rate, unemployment_rate, urban_population)
+SELECT c.country_id, ws.population_density, ws.agricultural_land, ws.land_area, ws.armed_forces, ws.birth_rate, ws.co2_emissions, ws.cpi, ws.fertility_rate, ws.forested_area, ws.gasoline_price, ws.gdp, ws.infant_mortality, ws.life_expectancy, ws.minimum_wage, ws.out_of_pocket_health_expenditure, ws.population, ws.population_labor_force, ws.tax_revenue, ws.total_tax_rate, ws.unemployment_rate, ws.urban_population
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+CREATE TABLE geography (
+    geo_id SERIAL PRIMARY KEY, -- Unique ID for each geographical record
+    country_id INT NOT NULL, -- Foreign key reference to countries table
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE CASCADE
+);
+
+INSERT INTO geography (country_id, latitude, longitude)
+SELECT c.country_id, ws.latitude, ws.longitude
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+
+CREATE TABLE cities (
+    city_id SERIAL PRIMARY KEY, -- Unique ID for each city record
+    country_id INT NOT NULL, -- Foreign key reference to countries table
+    capital_city TEXT,
+    largest_city TEXT,
+    FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE CASCADE
+);
+
+INSERT INTO cities (country_id, capital_city, largest_city)
+SELECT c.country_id, ws.capital_city, ws.largest_city
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+
+CREATE TABLE happiness(
+    happiness_id SERIAL PRIMARY KEY, -- Unique ID for each happiness record
+    country_id INT NOT NULL, -- Foreign key reference to countries table
+    ladder_score DECIMAL(5, 3),
+    social_support DECIMAL(5, 3),
+    healthy_life_expectancy DECIMAL(5, 2),
+    freedom_life_choices DECIMAL(5, 3),
+    generosity DECIMAL(5, 3),
+    perception_of_corruption DECIMAL(5, 3),
+    FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE CASCADE
+);
+
+INSERT INTO happiness (country_id, ladder_score, social_support, healthy_life_expectancy, freedom_life_choices, generosity, perception_of_corruption)
+SELECT DISTINCT c.country_id, hs.ladder_score, hs.social_support, hs.healthy_life_expectancy, hs.freedom_life_choices, hs.generosity, hs.perception_of_corruption
+FROM happiness_stats hs
+JOIN countries c ON hs.country_name = c.country_name;
+
+SELECT country_name, COUNT(*)
+FROM happiness_stats
+GROUP BY country_name
+HAVING COUNT(*) > 1;
+
+CREATE TABLE languages (
+    language_id SERIAL PRIMARY KEY, -- Unique ID for each language record
+    country_id INT NOT NULL, -- Foreign key reference to countries table
+    official_language TEXT,
+    FOREIGN KEY (country_id) REFERENCES countries(country_id) ON DELETE CASCADE
+);
+
+INSERT INTO languages (country_id, official_language)
+SELECT c.country_id, ws.official_language
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
