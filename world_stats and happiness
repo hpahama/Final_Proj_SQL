@@ -1,0 +1,61 @@
+DROP TABLE IF EXISTS world_stats;
+CREATE TABLE world_stats (
+  country_name TEXT ,
+  population_density INT,
+  agricultural_land FLOAT,
+  land_area INT,
+  armed_forces INT,
+  birth_rate FLOAT,
+  capital_city TEXT,
+  Co2_emissions INT,
+  cpi FlOAT,
+  fertility_rate FLOAT,
+  forested_area FLOAT,
+  gasoline_price DECIMAL(5, 2),
+  gdp DECIMAL(16, 2),
+  infant_mortality FLOAT,
+  largest_city TEXT,
+  life_expectancy FLOAT,
+  minimum_wage DECIMAL(5, 2),
+  official_language TEXT,
+  out_of_pocket_health_expenditure FLOAT,
+  population BIGINT,
+  population_labor_force FLOAT,
+  tax_revenue FLOAT,
+  total_tax_rate FLOAT,
+  unemployment_rate FLOAT,
+  urban_population BIGINT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION
+);
+COPY world_stats (country_name, population_density,	agricultural_land,	land_area,
+                  armed_forces,	birth_rate,	capital_city,	co2_emissions,	cpi,	fertility_rate,	forested_area,
+                  gasoline_price, gdp, infant_mortality,	largest_city,	life_expectancy,	minimum_wage,	official_language,
+                  out_of_pocket_health_expenditure,	population,	population_labor_force,	tax_revenue,
+                  total_tax_rate,	unemployment_rate,	urban_population,	latitude,	longitude)
+FROM '/Users/tippynewcomb/Public/Drop Box/world_stats_1.csv'
+WITH (FORMAT CSV, HEADER);
+
+DROP TABLE IF EXISTS happiness_stats;
+CREATE TABLE happiness_stats (
+    country_name TEXT,
+    ladder_score DECIMAL(5,3),
+    social_support DECIMAL(5,3),
+    healthy_life_expectancy DECIMAL(5,2),
+    freedom_life_choices DECIMAL(5,3),
+    Generosity DECIMAL(5,3),
+    perception_of_corruption DECIMAL(5,3)
+);
+
+
+COPY happiness_stats (country_name,ladder_score, social_support, healthy_life_expectancy,freedom_life_choices,
+    Generosity, perception_of_corruption) 
+FROM '/Users/tippynewcomb/Public/Drop Box/happiness_cleaned.csv'
+WITH (FORMAT CSV, HEADER);
+
+-- Delete rows where country_name does not exist both
+DELETE FROM world_stats
+WHERE country_name NOT IN (SELECT country_name FROM happiness_stats);
+
+DELETE FROM happiness_stats
+WHERE country_name NOT IN (SELECT country_name FROM world_stats);
