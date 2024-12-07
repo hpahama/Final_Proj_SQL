@@ -1,0 +1,54 @@
+Initial Data Cleaning
+
+Checked for missing values in the Happiness dataset: No missing values were found after cleaning.
+Checked for duplicate rows: There were no duplicates.
+Verified that the data looked fine and saved the cleaned data as a CSV file.
+Adjustments
+
+Cleaned the second dataset:
+Converted land percentage to decimal format.
+Removed dollar signs from gasoline prices.
+Removed commas from population values using Excel.
+Column Management
+
+Dropped unnecessary columns and renamed others to remove spaces (e.g., replaced spaces with underscores).
+Data Type Adjustments
+
+Converted percentage columns to decimal format.
+Issue Encountered
+
+Ran into a "zero bites" error when trying to load the cleaned data into SQL.
+Decided to focus on the 2023 data and dropped data from other years.
+SQL Table Creation
+
+Created tables in SQL:
+Countries table with a primary key (country_id) as a serial number.
+Economic table linked to the Countries table using a foreign key (country_id).
+Other tables like Geography and Happiness, with relevant columns and references.
+Data Mismatch
+
+Identified mismatched countries between datasets and dropped rows for countries present in one dataset but not the other.
+After cleaning, both datasets had 93 rows each.
+Query Examples
+
+Ran queries to find countries with the highest combined happiness score, minimum wage, and GDP.
+Also explored countries with high happiness scores and low perceptions of corruption (e.g., New Zealand).
+Found correlation between GDP, urban population, and happiness scores in top-ranking countries like the U.S., China, and Germany.
+Data Insights
+
+Explored possible correlations between happiness scores and minimum wage, urban population, and GDP.
+Considered adding questions about tax revenue, tax rates, and their correlation with perceptions of corruption or happiness.
+Issues with Generosity Data
+
+Encountered negative values in generosity data (possibly due to perception issues) and opted not to use it in analysis.
+Database Structure
+
+Suggested breaking the large economic table into smaller tables for better organization.
+Contemplated moving population and urban population data to a separate table to reduce clutter in the economic table.
+Additional Queries
+
+Mentioned using R visualizations to further explore the data, but not immediately possible due to time constraints.
+Next Steps
+
+Refined the database structure and data cleaning methods for better organization and clarity.
+Considered sharing a link for collaboration on the project and further refinement.
