@@ -1,0 +1,154 @@
+CREATE TABLE countries (
+    id SERIAL PRIMARY KEY, 
+    country_name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO countries (country_name)
+SELECT DISTINCT country_name
+FROM (
+    SELECT country_name FROM world_stats
+    UNION
+    SELECT country_name FROM happiness_stats
+) AS combined_countries;
+
+
+DROP TABLE IF EXISTS cities;
+
+CREATE TABLE cities (
+  city_id SERIAL PRIMARY KEY,  -- Unique ID for each city
+  id INT NOT NULL,  -- Foreign key to countries table (ID of the country)
+  city_name TEXT NOT NULL,  -- Name of the city
+  city_type TEXT CHECK (city_type IN ('capital', 'largest')),  -- Type of the city (capital or largest)
+  FOREIGN KEY (id) REFERENCES countries(id) ON DELETE CASCADE  -- Reference to countries table by ID
+);
+-- Add a unique constraint to prevent duplicates of city_name and country_id
+ALTER TABLE cities ADD CONSTRAINT unique_city_per_country UNIQUE (id, city_name);
+
+
+INSERT INTO cities (id, city_name, city_type)
+SELECT c.id, ws.capital_city, 'capital'
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name
+WHERE ws.capital_city IS NOT NULL
+ON CONFLICT (id, city_name) DO NOTHING;  -- Prevent duplicate cities for the same country
+
+INSERT INTO cities (id, city_name, city_type)
+SELECT c.id, ws.largest_city, 'largest'
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name
+WHERE ws.largest_city IS NOT NULL
+ON CONFLICT (id, city_name) DO NOTHING;  -- Prevent duplicate cities for the same country
+CREATE TABLE happiness(
+    id INT NOT NULL, -- Foreign key reference to countries table
+    ladder_score DECIMAL(5, 3),
+    social_support DECIMAL(5, 3),
+    healthy_life_expectancy DECIMAL(5, 2),
+    freedom_life_choices DECIMAL(5, 3),
+    generosity DECIMAL(5, 3),
+    perception_of_corruption DECIMAL(5, 3),
+    FOREIGN KEY (id) REFERENCES countries(id) ON DELETE CASCADE
+);
+
+INSERT INTO happiness (id, ladder_score, social_support, healthy_life_expectancy, freedom_life_choices, generosity, perception_of_corruption)
+SELECT DISTINCT c.id, hs.ladder_score, hs.social_support, hs.healthy_life_expectancy, hs.freedom_life_choices, hs.generosity, hs.perception_of_corruption
+FROM happiness_stats hs
+JOIN countries c ON hs.country_name = c.country_name;
+
+
+CREATE TABLE languages (
+    language_id SERIAL PRIMARY KEY,  
+    language_name TEXT NOT NULL UNIQUE  
+);
+
+-- Insert unique languages into the languages table
+INSERT INTO languages (language_name)
+SELECT DISTINCT official_language
+FROM world_stats
+WHERE official_language IS NOT NULL;
+
+CREATE TABLE country_languages (
+    id INT NOT NULL,  
+    language_id INT NOT NULL, 
+    PRIMARY KEY (id, language_id),  
+    FOREIGN KEY (id) REFERENCES countries(id) ON DELETE CASCADE,
+    FOREIGN KEY (language_id) REFERENCES languages(language_id) ON DELETE CASCADE
+);
+
+INSERT INTO country_languages (id, language_id)
+SELECT c.id, l.language_id
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name
+JOIN languages l ON ws.official_language = l.language_name
+WHERE ws.official_language IS NOT NULL;
+
+CREATE TABLE economic (
+    id INT PRIMARY KEY,  
+    armed_forces BIGINT,        
+    co2_emissions BIGINT,        
+    cpi FLOAT,                   
+    fertility_rate FLOAT,       
+    FOREIGN KEY (id) REFERENCES countries(id) ON DELETE CASCADE
+);
+
+INSERT INTO economic (id, armed_forces, co2_emissions, cpi, fertility_rate)
+SELECT DISTINCT c.id, ws.armed_forces, ws.co2_emissions, ws.cpi, ws.fertility_rate
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+
+DROP TABLE IF EXISTS geography;
+CREATE TABLE geography (
+    id INT PRIMARY KEY, 
+    latitude DOUBLE PRECISION, 
+    longitude DOUBLE PRECISION, 
+    land_area INT,           
+    agricultural_land FLOAT,   
+    forested_area FLOAT,       
+    FOREIGN KEY (id) REFERENCES countries(id) ON DELETE CASCADE
+);
+
+INSERT INTO geography (id, latitude, longitude, land_area, agricultural_land, forested_area)
+SELECT DISTINCT c.id, ws.latitude, ws.longitude, ws.land_area, ws.agricultural_land, 
+                ws.forested_area 
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+CREATE TABLE population_demographics (
+    id INT PRIMARY KEY REFERENCES countries(id) ON DELETE CASCADE,
+    population_density BIGINT,
+    urban_population BIGINT
+);
+
+INSERT INTO population_demographics (id, population_density, urban_population)
+SELECT c.id, ws.population_density, ws.urban_population
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+
+CREATE TABLE health_metrics (
+    id INT PRIMARY KEY REFERENCES countries(id) ON DELETE CASCADE,
+    birth_rate FLOAT,
+    infant_mortality FLOAT,
+    life_expectancy FLOAT
+);
+INSERT INTO health_metrics (id, birth_rate, infant_mortality, life_expectancy)
+SELECT c.id, ws.birth_rate, ws.infant_mortality, ws.life_expectancy
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
+
+CREATE TABLE financials (
+    id INT PRIMARY KEY,                    
+    gasoline_price DECIMAL(5, 2),           
+    minimum_wage DECIMAL(5, 2),            
+    tax_revenue FLOAT,                     
+    total_tax_rate FLOAT,                   
+    unemployment_rate FLOAT,               
+    FOREIGN KEY (id) REFERENCES countries(id) ON DELETE CASCADE  -- Foreign key to countries table
+);
+
+INSERT INTO financials (id, gasoline_price, minimum_wage, tax_revenue, total_tax_rate, unemployment_rate)
+SELECT c.id, ws.gasoline_price, ws.minimum_wage, ws.tax_revenue, ws.total_tax_rate, ws.unemployment_rate
+FROM world_stats ws
+JOIN countries c ON ws.country_name = c.country_name;
+
