@@ -1,4 +1,4 @@
---Step #1:
+--Step #1: Creating Tables
         -- Create the final_project schema if it doesn't already exist
         CREATE SCHEMA IF NOT EXISTS final_project;
         
@@ -87,7 +87,7 @@
             FOREIGN KEY (country_id) REFERENCES final_project.countries(country_id) ON DELETE CASCADE
         );
 
---Step #2:
+--Step #2: Populating Tables
         -- Populate the economic table
         INSERT INTO final_project.economic (country_id, armed_forces, co2_emissions, cpi, fertility_rate)
         SELECT c.country_id, ws.armed_forces, ws.co2_emissions, ws.cpi, ws.fertility_rate
