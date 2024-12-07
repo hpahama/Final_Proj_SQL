@@ -52,3 +52,31 @@ Next Steps
 
 Refined the database structure and data cleaning methods for better organization and clarity.
 Considered sharing a link for collaboration on the project and further refinement.
+
+
+
+-=-=-=-=-=-
+Questions for the problem set:
+Demographics:
+- Countries with the highest GDP, happiness ladder score, and an urban population exceeding 50% of the total population.
+  - This question examines demographic factors like the urban population size alongside GDP and happiness.
+
+- Correlation between generosity and happiness ladder score.
+  - This explores how generosity, a demographic/social behavior, correlates with happiness scores in different countries.
+
+Geographical:
+- Country with the highest happiness score and the lowest perception of corruption.
+  - Focuses on finding a country (geographical focus) with specific social characteristics, linking happiness and corruption perception.
+
+Economical:
+- Top countries with the highest combined happiness ladder score, minimum wage, and GDP.
+  - Focuses on the relationship between happiness, economic factors like minimum wage, and GDP.
+
+- Country with the highest minimum wage and a high overall happiness ladder score.
+  - Investigates the relationship between high minimum wage and high happiness.
+
+- Correlation between minimum wage and happiness ladder score across countries.
+  - Looks at how minimum wage (an economic factor) correlates with happiness scores.
+
+- How tax revenue or tax rates affect the perception of corruption or happiness ladder score.
+  - Analyzes how economic factors like tax policies influence corruption and happiness.
