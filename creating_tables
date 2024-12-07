@@ -1,0 +1,84 @@
+-- Create the final_project schema if it doesn't already exist
+CREATE SCHEMA IF NOT EXISTS Final_Project;
+
+-- Create the countries table
+CREATE TABLE IF NOT EXISTS Final_Project.countries (
+    country_id SERIAL PRIMARY KEY,
+    country_name TEXT UNIQUE
+);
+
+-- Create the economic table
+CREATE TABLE IF NOT EXISTS Final_Project.economic (
+    economic_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id),
+    armed_forces BIGINT,
+    co2_emissions BIGINT,
+    cpi FLOAT,
+    fertility_rate FLOAT
+);
+
+-- Create the geography table
+CREATE TABLE IF NOT EXISTS Final_Project.geography (
+    geo_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    land_area BIGINT,
+    agricultural_land BIGINT,
+    forested_area BIGINT
+);
+
+-- Create the cities table
+CREATE TABLE IF NOT EXISTS Final_Project.cities (
+    city_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    city_name TEXT,
+    type TEXT
+);
+
+-- Create the languages table
+CREATE TABLE IF NOT EXISTS Final_Project.languages (
+    language_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    official_language TEXT
+);
+
+-- Create the financials table
+CREATE TABLE IF NOT EXISTS Final_Project.financials (
+    financial_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    gasoline_price DECIMAL(5, 2),
+    minimum_wage DECIMAL(5, 2),
+    tax_revenue FLOAT,
+    total_tax_rate FLOAT,
+    unemployment_rate FLOAT
+);
+
+-- Create the happiness table
+CREATE TABLE IF NOT EXISTS Final_Project.happiness (
+    happiness_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    life_ladder DECIMAL(5, 3),
+    social_support DECIMAL(5, 3),
+    healthy_life_expectancy DECIMAL(5, 2),
+    freedom_life_choices DECIMAL(5, 3),
+    generosity DECIMAL(5, 3),
+    perceptions_of_corruption DECIMAL(5, 3),
+    positive_affect DECIMAL(5, 3),
+    negative_affect DECIMAL(5, 3)
+);
+
+-- Create the population table
+CREATE TABLE IF NOT EXISTS Final_Project.population (
+    population_id SERIAL PRIMARY KEY,
+    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    population_density BIGINT,
+    urban_population BIGINT,
+    birth_rate FLOAT,
+    infant_mortality FLOAT,
+    life_expectancy BIGINT
+);
+
+
+
+-=-=-=-=-=-
