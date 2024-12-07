@@ -1,16 +1,16 @@
 -- Create the final_project schema if it doesn't already exist
-CREATE SCHEMA IF NOT EXISTS Final_Project;
+CREATE SCHEMA IF NOT EXISTS final_project;
 
 -- Create the countries table
-CREATE TABLE IF NOT EXISTS Final_Project.countries (
+CREATE TABLE IF NOT EXISTS final_project.countries (
     country_id SERIAL PRIMARY KEY,
     country_name TEXT UNIQUE
 );
 
 -- Create the economic table
-CREATE TABLE IF NOT EXISTS Final_Project.economic (
+CREATE TABLE IF NOT EXISTS final_project.economic (
     economic_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id),
+    country_id INT REFERENCES final_project.countries(country_id),
     armed_forces BIGINT,
     co2_emissions BIGINT,
     cpi FLOAT,
@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS Final_Project.economic (
 );
 
 -- Create the geography table
-CREATE TABLE IF NOT EXISTS Final_Project.geography (
+CREATE TABLE IF NOT EXISTS final_project.geography (
     geo_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    country_id INT REFERENCES final_project.countries(country_id) ON DELETE CASCADE,
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
     land_area BIGINT,
@@ -29,24 +29,24 @@ CREATE TABLE IF NOT EXISTS Final_Project.geography (
 );
 
 -- Create the cities table
-CREATE TABLE IF NOT EXISTS Final_Project.cities (
+CREATE TABLE IF NOT EXISTS final_project.cities (
     city_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    country_id INT REFERENCES final_project.countries(country_id) ON DELETE CASCADE,
     city_name TEXT,
     type TEXT
 );
 
 -- Create the languages table
-CREATE TABLE IF NOT EXISTS Final_Project.languages (
+CREATE TABLE IF NOT EXISTS final_project.languages (
     language_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    country_id INT REFERENCES final_project.countries(country_id) ON DELETE CASCADE,
     official_language TEXT
 );
 
 -- Create the financials table
-CREATE TABLE IF NOT EXISTS Final_Project.financials (
+CREATE TABLE IF NOT EXISTS final_project.financials (
     financial_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    country_id INT REFERENCES final_project.countries(country_id) ON DELETE CASCADE,
     gasoline_price DECIMAL(5, 2),
     minimum_wage DECIMAL(5, 2),
     tax_revenue FLOAT,
@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS Final_Project.financials (
 );
 
 -- Create the happiness table
-CREATE TABLE IF NOT EXISTS Final_Project.happiness (
+CREATE TABLE IF NOT EXISTS final_project.happiness (
     happiness_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    country_id INT REFERENCES final_project.countries(country_id) ON DELETE CASCADE,
     life_ladder DECIMAL(5, 3),
     social_support DECIMAL(5, 3),
     healthy_life_expectancy DECIMAL(5, 2),
@@ -69,9 +69,9 @@ CREATE TABLE IF NOT EXISTS Final_Project.happiness (
 );
 
 -- Create the population table
-CREATE TABLE IF NOT EXISTS Final_Project.population (
+CREATE TABLE IF NOT EXISTS final_project.population (
     population_id SERIAL PRIMARY KEY,
-    country_id INT REFERENCES Final_Project.countries(country_id) ON DELETE CASCADE,
+    country_id INT REFERENCES final_project.countries(country_id) ON DELETE CASCADE,
     population_density BIGINT,
     urban_population BIGINT,
     birth_rate FLOAT,
@@ -79,6 +79,36 @@ CREATE TABLE IF NOT EXISTS Final_Project.population (
     life_expectancy BIGINT
 );
 
+-- Populate the economic table from world_stats
+INSERT INTO final_project.economic (country_id, armed_forces, co2_emissions, cpi, fertility_rate)
+SELECT c.country_id, ws.armed_forces, ws.co2_emissions, ws.cpi, ws.fertility_rate
+FROM final_project.world_stats ws
+JOIN final_project.countries c ON ws.country_name = c.country_name;
 
+-- Populate the geography table from world_stats
+INSERT INTO final_project.geography (country_id, latitude, longitude, land_area, agricultural_land, forested_area)
+SELECT c.country_id, ws.latitude, ws.longitude, ws.land_area, ws.agricultural_land, ws.forested_area
+FROM final_project.world_stats ws
+JOIN final_project.countries c ON ws.country_name = c.country_name;
 
--=-=-=-=-=-
+-- Populate the cities table from world_stats
+INSERT INTO final_project.cities (country_id, city_name, type)
+SELECT c.country_id, ws.city_name, ws.type
+FROM final_project.world_stats ws
+JOIN final_project.countries c ON ws.country_name = c.country_name;
+
+-- Populate the languages table from world_stats
+INSERT INTO final_project.languages (country_id, official_language)
+SELECT c.country_id, ws.official_language
+FROM final_project.world_stats ws
+JOIN final_project.countries c ON ws.country_name = c.country_name;
+
+-- Populate the financials table from world_stats
+INSERT INTO final_project.financials (country_id, gasoline_price, minimum_wage, tax_revenue, total_tax_rate, unemployment_rate)
+SELECT c.country_id, ws.gasoline_price, ws.minimum_wage, ws.tax_revenue, ws.total_tax_rate, ws.unemployment_rate
+FROM final_project.world_stats ws
+JOIN final_project.countries c ON ws.country_name = c.country_name;
+
+-- Populate the happiness table from happiness_stats
+INSERT INTO final_project.happiness (country_id, life_ladder, social_support, healthy_life_expectancy, freedom_life_choices, generosity, perceptions_of_corruption, positive_affect, negative_affect)
+SELECT c.country_id, hs.life_ladder, hs.social_support, hs.healthy_life_expectancy, hs.freedom_life_choices, hs.generosity, hs.perceptio
